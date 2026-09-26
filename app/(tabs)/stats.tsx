@@ -1,38 +1,57 @@
-import { useMemo } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import { useTheme } from "../../context/ThemeContext";
-import { useTodos } from "../../context/TodoContext";
 
 export default function StatsScreen() {
   const { colors } = useTheme();
-  const { todos } = useTodos();
+  const stats = useQuery(api.todos.getStats);
 
-  const total = todos.length;
-  const completed = todos.filter((t) => t.completed).length;
-  const active = total - completed;
-  const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
-
-  const cards = [
-    { title: "Всього", value: total, icon: "list-outline", color: colors.primary },
-    { title: "Активні", value: active, icon: "time-outline", color: "#f59e0b" },
-    { title: "Виконані", value: completed, icon: "checkmark-circle-outline", color: colors.success },
-    { title: "Прогрес", value: `${percent}%`, icon: "trending-up-outline", color: colors.primary },
-  ];
+  if (stats === undefined) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.bg }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={[styles.title, { color: colors.text }]}>Статистика</Text>
+        <Text style={[styles.title, { color: colors.text }]}>📊 Статистика</Text>
+        <Text style={[styles.subtitle, { color: colors.textMuted }]}>
+          Аналітика завдань у реальному часі
+        </Text>
+
         <View style={styles.grid}>
-          {cards.map((card) => (
-            <View key={card.title} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <Ionicons name={card.icon as any} size={32} color={card.color} />
-              <Text style={[styles.value, { color: colors.text }]}>{card.value}</Text>
-              <Text style={[styles.label, { color: colors.textMuted }]}>{card.title}</Text>
-            </View>
-          ))}
+          <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Ionicons name="list" size={28} color={colors.primary} />
+            <Text style={[styles.cardValue, { color: colors.text }]}>{stats.total}</Text>
+            <Text style={[styles.cardLabel, { color: colors.textMuted }]}>Всього завдань</Text>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Ionicons name="time" size={28} color="#F59E0B" />
+            <Text style={[styles.cardValue, { color: colors.text }]}>{stats.active}</Text>
+            <Text style={[styles.cardLabel, { color: colors.textMuted }]}>В процесі</Text>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Ionicons name="checkmark-done-circle" size={28} color={colors.success} />
+            <Text style={[styles.cardValue, { color: colors.text }]}>{stats.completed}</Text>
+            <Text style={[styles.cardLabel, { color: colors.textMuted }]}>Виконано</Text>
+          </View>
+
+          <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Ionicons name="trending-up" size={28} color="#8B5CF6" />
+            <Text style={[styles.cardValue, { color: colors.text }]}>{stats.percentage}%</Text>
+            <Text style={[styles.cardLabel, { color: colors.textMuted }]}>Прогрес</Text>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -40,18 +59,20 @@ export default function StatsScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
-  content: { padding: 16 },
-  title: { fontSize: 28, fontWeight: "bold", marginBottom: 20 },
+  container: { flex: 1 },
+  content: { padding: 20 },
+  centerContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  title: { fontSize: 28, fontWeight: "bold" },
+  subtitle: { fontSize: 14, marginTop: 4, marginBottom: 20 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   card: {
     width: "48%",
-    padding: 20,
-    borderRadius: 12,
+    padding: 16,
+    borderRadius: 16,
     borderWidth: 1,
     alignItems: "center",
-    marginBottom: 12,
+    gap: 6,
   },
-  value: { fontSize: 28, fontWeight: "bold", marginTop: 8 },
-  label: { fontSize: 13, marginTop: 4 },
+  cardValue: { fontSize: 24, fontWeight: "bold" },
+  cardLabel: { fontSize: 13 },
 });

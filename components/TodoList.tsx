@@ -1,34 +1,22 @@
-import {
-  FlatList,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import type { Todo } from "../types";
 import { TodoItem } from "./TodoItem";
+import { useTheme } from "../context/ThemeContext";
 
 interface TodoListProps {
   todos: Todo[];
-  refreshing: boolean;
-  onRefresh: () => Promise<void>;
-  onToggle: (id: string, completed: boolean) => Promise<void>;
+  onToggle: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onEdit: (id: string, text: string) => Promise<void>;
 }
 
-export function TodoList({
-  todos,
-  refreshing,
-  onRefresh,
-  onToggle,
-  onDelete,
-  onEdit,
-}: TodoListProps) {
+export function TodoList({ todos, onToggle, onDelete, onEdit }: TodoListProps) {
+  const { colors } = useTheme();
+
   if (todos.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>
+        <Text style={[styles.emptyText, { color: colors.textMuted }]}>
           Список завдань порожній. Додайте нове завдання!
         </Text>
       </View>
@@ -38,7 +26,7 @@ export function TodoList({
   return (
     <FlatList
       data={todos}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item._id}
       renderItem={({ item }) => (
         <TodoItem
           todo={item}
@@ -49,28 +37,12 @@ export function TodoList({
       )}
       contentContainerStyle={styles.listContent}
       showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={["#6366f1"]}
-        />
-      }
     />
   );
 }
 
 const styles = StyleSheet.create({
-  emptyContainer: {
-    padding: 32,
-    alignItems: "center",
-  },
-  emptyText: {
-    fontSize: 14,
-    color: "#999",
-    textAlign: "center",
-  },
-  listContent: {
-    paddingBottom: 16,
-  },
+  emptyContainer: { padding: 32, alignItems: "center" },
+  emptyText: { fontSize: 14, textAlign: "center" },
+  listContent: { paddingBottom: 16 },
 });

@@ -1,22 +1,20 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { ThemeProvider, useTheme } from "../context/ThemeContext";
-import { TodoProvider } from "../context/TodoContext";
+
+const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
+  unsavedChangesWarning: false,
+});
 
 function RootNavigator() {
-  const { colors, isDarkMode } = useTheme();
-
+  const { isDarkMode } = useTheme();
   return (
     <>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.bg },
-        }}
-      >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
       </Stack>
     </>
   );
@@ -25,11 +23,11 @@ function RootNavigator() {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <ThemeProvider>
-        <TodoProvider>
+      <ConvexProvider client={convex}>
+        <ThemeProvider>
           <RootNavigator />
-        </TodoProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </ConvexProvider>
     </SafeAreaProvider>
   );
 }

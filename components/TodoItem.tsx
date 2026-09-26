@@ -6,7 +6,7 @@ import { useTheme } from "../context/ThemeContext";
 
 interface TodoItemProps {
   todo: Todo;
-  onToggle: (id: string, completed: boolean) => Promise<void>;
+  onToggle: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onEdit: (id: string, text: string) => Promise<void>;
 }
@@ -23,23 +23,36 @@ export function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
       setIsEditing(false);
       return;
     }
-    if (trimmed !== todo.text) await onEdit(todo.id, trimmed);
+    if (trimmed !== todo.text) {
+      await onEdit(todo._id, trimmed);
+    }
     setIsEditing(false);
   };
 
   return (
-    <View style={[styles.item, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-      <TouchableOpacity onPress={() => onToggle(todo.id, !todo.completed)} style={styles.iconBtn}>
+    <View
+      style={[
+        styles.item,
+        { backgroundColor: colors.surface, borderColor: colors.border },
+      ]}
+    >
+      <TouchableOpacity
+        onPress={() => onToggle(todo._id)}
+        style={styles.iconBtn}
+      >
         <Ionicons
-          name={todo.completed ? "checkmark-circle" : "ellipse-outline"}
+          name={todo.isCompleted ? "checkmark-circle" : "ellipse-outline"}
           size={26}
-          color={todo.completed ? colors.success : colors.primary}
+          color={todo.isCompleted ? colors.success : colors.primary}
         />
       </TouchableOpacity>
 
       {isEditing ? (
         <TextInput
-          style={[styles.editInput, { color: colors.text, borderBottomColor: colors.primary }]}
+          style={[
+            styles.editInput,
+            { color: colors.text, borderBottomColor: colors.primary },
+          ]}
           value={editText}
           onChangeText={setEditText}
           onSubmitEditing={handleSave}
@@ -49,14 +62,21 @@ export function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
         />
       ) : (
         <Text
-          style={[styles.text, { color: todo.completed ? colors.textMuted : colors.text }, todo.completed && styles.textCompleted]}
+          style={[
+            styles.text,
+            { color: todo.isCompleted ? colors.textMuted : colors.text },
+            todo.isCompleted && styles.textCompleted,
+          ]}
           onPress={() => setIsEditing(true)}
         >
           {todo.text}
         </Text>
       )}
 
-      <TouchableOpacity onPress={() => onDelete(todo.id)} style={styles.iconBtn}>
+      <TouchableOpacity
+        onPress={() => onDelete(todo._id)}
+        style={styles.iconBtn}
+      >
         <Ionicons name="trash-outline" size={22} color={colors.danger} />
       </TouchableOpacity>
     </View>
