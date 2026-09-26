@@ -1,12 +1,8 @@
 import { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import type { Todo } from "../types";
+import { useTheme } from "../context/ThemeContext";
 
 interface TodoItemProps {
   todo: Todo;
@@ -16,6 +12,7 @@ interface TodoItemProps {
 }
 
 export function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
+  const { colors } = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
 
@@ -26,52 +23,41 @@ export function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
       setIsEditing(false);
       return;
     }
-    if (trimmed === todo.text) {
-      setIsEditing(false);
-      return;
-    }
-    await onEdit(todo.id, trimmed);
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setEditText(todo.text);
+    if (trimmed !== todo.text) await onEdit(todo.id, trimmed);
     setIsEditing(false);
   };
 
   return (
-    <View style={styles.item}>
-      <TouchableOpacity
-        style={styles.checkbox}
-        onPress={() => onToggle(todo.id, !todo.completed)}
-      >
-        <Text style={styles.checkboxText}>{todo.completed ? "✓" : ""}</Text>
+    <View style={[styles.item, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+      <TouchableOpacity onPress={() => onToggle(todo.id, !todo.completed)} style={styles.iconBtn}>
+        <Ionicons
+          name={todo.completed ? "checkmark-circle" : "ellipse-outline"}
+          size={26}
+          color={todo.completed ? colors.success : colors.primary}
+        />
       </TouchableOpacity>
 
       {isEditing ? (
         <TextInput
-          style={styles.editInput}
+          style={[styles.editInput, { color: colors.text, borderBottomColor: colors.primary }]}
           value={editText}
           onChangeText={setEditText}
           onSubmitEditing={handleSave}
-          onBlur={handleCancel}
+          onBlur={handleSave}
           autoFocus
           returnKeyType="done"
         />
       ) : (
         <Text
-          style={[styles.text, todo.completed && styles.textCompleted]}
+          style={[styles.text, { color: todo.completed ? colors.textMuted : colors.text }, todo.completed && styles.textCompleted]}
           onPress={() => setIsEditing(true)}
         >
           {todo.text}
         </Text>
       )}
 
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={() => onDelete(todo.id)}
-      >
-        <Text style={styles.deleteText}>✕</Text>
+      <TouchableOpacity onPress={() => onDelete(todo.id)} style={styles.iconBtn}>
+        <Ionicons name="trash-outline" size={22} color={colors.danger} />
       </TouchableOpacity>
     </View>
   );
@@ -81,52 +67,19 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
     padding: 12,
     borderRadius: 8,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: "#eee",
   },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#6366f1",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  checkboxText: {
-    color: "#6366f1",
-    fontWeight: "bold",
-    fontSize: 14,
-  },
-  text: {
-    flex: 1,
-    fontSize: 16,
-    color: "#1a1a2e",
-  },
-  textCompleted: {
-    textDecorationLine: "line-through",
-    color: "#999",
-  },
+  iconBtn: { padding: 4 },
+  text: { flex: 1, fontSize: 16, marginHorizontal: 10 },
+  textCompleted: { textDecorationLine: "line-through" },
   editInput: {
     flex: 1,
     fontSize: 16,
-    color: "#1a1a2e",
     borderBottomWidth: 1,
-    borderBottomColor: "#6366f1",
     paddingVertical: 4,
-  },
-  deleteButton: {
-    padding: 8,
-    marginLeft: 8,
-  },
-  deleteText: {
-    fontSize: 18,
-    color: "#ef4444",
-    fontWeight: "bold",
+    marginHorizontal: 10,
   },
 });

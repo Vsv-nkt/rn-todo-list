@@ -1,13 +1,6 @@
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  Keyboard,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useTheme } from "../context/ThemeContext";
 
 interface TodoFormProps {
   onAdd: (text: string) => Promise<void>;
@@ -15,33 +8,30 @@ interface TodoFormProps {
 }
 
 export function TodoForm({ onAdd, loading }: TodoFormProps) {
+  const { colors } = useTheme();
   const [text, setText] = useState("");
 
   const handleSubmit = async () => {
     if (!text.trim()) return;
-    try {
-      await onAdd(text.trim());
-      setText("");
-      Keyboard.dismiss();
-    } catch (err) {
-      console.error(err);
-    }
+    await onAdd(text.trim());
+    setText("");
+    Keyboard.dismiss();
   };
 
   return (
     <View style={styles.form}>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
         value={text}
         onChangeText={setText}
         placeholder="Що потрібно зробити?"
-        placeholderTextColor="#999"
+        placeholderTextColor={colors.textMuted}
         editable={!loading}
         onSubmitEditing={handleSubmit}
         returnKeyType="done"
       />
       <TouchableOpacity
-        style={[styles.button, !text.trim() && styles.buttonDisabled]}
+        style={[styles.button, { backgroundColor: colors.primary }, !text.trim() && styles.buttonDisabled]}
         onPress={handleSubmit}
         disabled={!text.trim() || loading}
       >
@@ -56,24 +46,16 @@ export function TodoForm({ onAdd, loading }: TodoFormProps) {
 }
 
 const styles = StyleSheet.create({
-  form: {
-    flexDirection: "row",
-    marginBottom: 20,
-    gap: 8,
-  },
+  form: { flexDirection: "row", marginBottom: 20, gap: 8 },
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 16,
-    backgroundColor: "#fff",
-    color: "#1a1a2e",
   },
   button: {
-    backgroundColor: "#6366f1",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
@@ -81,12 +63,6 @@ const styles = StyleSheet.create({
     minWidth: 80,
     alignItems: "center",
   },
-  buttonDisabled: {
-    backgroundColor: "#c7c7c7",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
+  buttonDisabled: { backgroundColor: "#c7c7c7" },
+  buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
 });
