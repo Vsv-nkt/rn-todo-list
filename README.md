@@ -1,22 +1,24 @@
-# Todo App v3.0 — Convex Cloud Edition
+# Todo App 4.0 — EAS Build & Preview APK
 
-Мобільний додаток списку завдань на **React Native (Expo)** з хмарним бекендом **Convex** та **Real-Time синхронізацією**.
+## 🚀 Preview APK (EAS Build)
 
-## 🎯 Що нового в v3.0
+- **Build page:** https://expo.dev/accounts/nikita2009/projects/rn-todo-list/builds/a038e5bc
+- **Status:** ✅ Succeeded
+- **Build time:** 20m 50s
+- **Profile:** preview
+- **Channel:** preview
 
-- ☁️ **Convex** — хмарна база даних замість локального AsyncStorage.
-- ⚡ **Real-Time синхронізація** — зміни з'являються миттєво на всіх пристроях без перезавантаження.
-- 🔧 **Серверні функції на TypeScript** — 8 queries та mutations.
-- 📊 **Статистика на стороні бекенду** — швидший розрахунок.
-- 🎨 **Тема** (світла/темна) залишається локально через AsyncStorage.
+## ⚙️ Динамічна конфігурація середовищ
 
-## 🛠️ Технології
+Реалізовано через `app.config.ts`:
+- **Development** — Todo App Dev (`com.nikita2009.rntodolist.dev`)
+- **Preview** — Todo App Preview (`com.nikita2009.rntodolist.preview`)
+- **Production** — Todo App (`com.nikita2009.rntodolist`)
 
-- React Native + Expo (SDK 57)
-- **Convex** (Cloud Backend + Real-Time)
-- TypeScript
-- Expo Router (файловий роутинг)
-- AsyncStorage (тільки для теми)
-- @expo/vector-icons (Ionicons)
+## 🌐 Environment Variables в EAS
 
-## 📁 Структура проєкту
+Налаштовано для `development` та `preview`:
+- `APP_ENV`
+- `EXPO_PUBLIC_CONVEX_URL`
+- `CONVEX_DEPLOYMENT`
+

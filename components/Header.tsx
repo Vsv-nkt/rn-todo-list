@@ -10,7 +10,7 @@ export function Header({ totalCount, completedCount }: HeaderProps) {
   const { colors } = useTheme();
   return (
     <View style={styles.header}>
-      <Text style={[styles.title, { color: colors.text }]}>Мій Список Завдань</Text>
+      <Text style={[styles.title, { color: colors.text }]}>Мій Список Завдань v2</Text>
       <Text style={[styles.subtitle, { color: colors.textMuted }]}>
         Виконано {completedCount} з {totalCount}
       </Text>
